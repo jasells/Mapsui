@@ -92,9 +92,7 @@ namespace Mapsui.Samples.Forms
 
         private async System.Threading.Tasks.Task CenterOnLocationAsync()
         {
-            var p = await CrossGeolocator.Current.GetLastKnownLocationAsync();
-
-            p = p ?? await CrossGeolocator.Current.GetPositionAsync();
+            Plugin.Geolocator.Abstractions.Position p = await GetCurrentLocationAsnyc();
 
             if (p != null)
             {
@@ -102,6 +100,13 @@ namespace Mapsui.Samples.Forms
 
                 CenterOnLocation(p);
             }
+        }
+
+        private static async System.Threading.Tasks.Task<Plugin.Geolocator.Abstractions.Position> GetCurrentLocationAsnyc()
+        {
+            var p = await CrossGeolocator.Current.GetLastKnownLocationAsync();
+
+            return p ?? await CrossGeolocator.Current.GetPositionAsync();
         }
 
         private void CenterOnLocation(Plugin.Geolocator.Abstractions.Position geoLoc)
@@ -219,5 +224,38 @@ namespace Mapsui.Samples.Forms
             });
         }
 
+        private async void OnCreatePinBtnClicked(object sender, EventArgs e)
+        {
+            //test deadlock on UI thread...
+            // hard code a location for now
+
+            var geo = await GetCurrentLocationAsnyc();
+
+            var p = new Mapsui.UI.Forms.Position(geo.Latitude, geo.Longitude );
+
+            var pin = new Pin(mapView)
+            {
+                Label = $"{nameof(PinType.Pin)} UI thread pin",
+                Address = p.ToString(),
+                Position = p,
+                Type = PinType.Pin,
+                Color = Color.DarkRed,
+                Transparency = .05f,
+                Scale = 1f,
+            };
+
+            pin.CalloutAnchor = new Point(0, pin.Height * pin.Scale);
+            //await System.Threading.Tasks.Task.Run(() =>
+            //{
+            pin.Callout.RectRadius = 20;
+            pin.Callout.ArrowHeight = 20;
+            pin.Callout.ArrowWidth = 20;
+            pin.Callout.ArrowAlignment = ArrowAlignment.Bottom;
+            pin.Callout.ArrowPosition = 0.5f;
+            pin.Callout.SubtitleLabel.LineBreakMode = LineBreakMode.NoWrap;
+
+            //});
+            mapView.Pins.Add(pin);
+        }
     }
 }
