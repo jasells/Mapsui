@@ -66,7 +66,7 @@ namespace Mapsui.Samples.Forms
             e.Handled = clicker == null ? false : (bool)clicker?.Invoke(sender as MapView, e);
         }
 
-        void OnSelection(object sender, SelectedItemChangedEventArgs e)
+        async void OnSelection(object sender, SelectedItemChangedEventArgs e)
         {
             if (e.SelectedItem == null)
             {
@@ -85,7 +85,31 @@ namespace Mapsui.Samples.Forms
             if (sample is IFormsSample)
                 clicker = ((IFormsSample)sample).OnClick;
 
+            await CenterOnLocationAsync();
+
             listView.SelectedItem = null;
+        }
+
+        private async System.Threading.Tasks.Task CenterOnLocationAsync()
+        {
+            var p = await CrossGeolocator.Current.GetLastKnownLocationAsync();
+
+            p = p ?? await CrossGeolocator.Current.GetPositionAsync();
+
+            if (p != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"{nameof(OnSelection)}()---  location: [{p.Latitude}, {p.Longitude}]");
+
+                CenterOnLocation(p);
+            }
+        }
+
+        private void CenterOnLocation(Plugin.Geolocator.Abstractions.Position geoLoc)
+        {
+            if (geoLoc.Latitude != 0 || geoLoc.Latitude != 0) // uninitialized
+            {
+                mapView.Navigator.CenterOn(Mapsui.Projection.SphericalMercator.FromLonLat(geoLoc.Longitude, geoLoc.Latitude));
+            }
         }
 
         private void OnPinClicked(object sender, PinClickedEventArgs e)
@@ -128,6 +152,31 @@ namespace Mapsui.Samples.Forms
             CrossGeolocator.Current.PositionError += MyLocationPositionError;
         }
 
+        //protected override async void OnAppearing()
+        //{
+        //    base.OnAppearing();
+
+        //    // make sure we're centered on location @ start
+        //    if (CrossGeolocator.Current.IsGeolocationAvailable)
+        //    {
+        //        var p = await CrossGeolocator.Current.GetLastKnownLocationAsync();
+
+
+        //        p = p ?? await CrossGeolocator.Current.GetPositionAsync();
+
+        //        System.Diagnostics.Debug.WriteLine($"{nameof(OnAppearing)}()---  location: [{p.Latitude}, {p.Longitude}]");
+
+
+        //        if (p != null)
+        //        {
+        //            MyLocationPositionChanged(CrossGeolocator.Current, new PositionEventArgs(p));
+
+        //            mapView.Navigator.CenterOn(new Geometries.Point(p.Latitude, p.Longitude));
+        //        }
+        //    }
+        //}
+
+
         public async void StopGPS()
         {
             if (Device.RuntimePlatform == Device.WPF)
@@ -156,11 +205,17 @@ namespace Mapsui.Samples.Forms
         /// <param name="e">Event arguments for new position</param>
         private void MyLocationPositionChanged(object sender, PositionEventArgs e)
         {
+            System.Diagnostics.Debug.WriteLine($"{nameof(MyLocationPositionChanged)}()---  args: [{e.Position.Latitude}, {e.Position.Longitude}]");
+
+
             Device.BeginInvokeOnMainThread(() =>
             {
                 mapView.MyLocationLayer.UpdateMyLocation(new UI.Forms.Position(e.Position.Latitude, e.Position.Longitude));
                 mapView.MyLocationLayer.UpdateMyDirection(e.Position.Heading, mapView.Viewport.Rotation);
                 mapView.MyLocationLayer.UpdateMySpeed(e.Position.Speed);
+
+                System.Diagnostics.Debug.WriteLine($"{nameof(MapView.MyLocationLayer.MyLocation)}()---  loc: [{mapView.MyLocationLayer.MyLocation.Latitude}, {mapView.MyLocationLayer.MyLocation.Longitude}]");
+
             });
         }
 
