@@ -235,7 +235,7 @@ namespace Mapsui.Samples.Forms
 
             var pin = new Pin(mapView)
             {
-                Label = $"{nameof(PinType.Pin)} UI thread pin",
+                Label = $"UI thread created {nameof(PinType.Pin)} and {nameof(Callout)} ",
                 Address = p.ToString(),
                 Position = p,
                 Type = PinType.Pin,

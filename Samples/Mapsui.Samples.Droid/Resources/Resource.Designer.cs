@@ -26,11 +26,6 @@ namespace Mapsui.Samples.Droid
 		
 		public static void UpdateIdValues()
 		{
-			global::Mapsui.UI.Android.Resource.Attribute.start_with_openstreetmap = global::Mapsui.Samples.Droid.Resource.Attribute.start_with_openstreetmap;
-			global::Mapsui.UI.Android.Resource.String.ApplicationName = global::Mapsui.Samples.Droid.Resource.String.ApplicationName;
-			global::Mapsui.UI.Android.Resource.String.Hello = global::Mapsui.Samples.Droid.Resource.String.Hello;
-			global::Mapsui.UI.Android.Resource.Styleable.start_with_openstreetmap_style = global::Mapsui.Samples.Droid.Resource.Styleable.start_with_openstreetmap_style;
-			global::Mapsui.UI.Android.Resource.Styleable.start_with_openstreetmap_style_start_with_openstreetmap = global::Mapsui.Samples.Droid.Resource.Styleable.start_with_openstreetmap_style_start_with_openstreetmap;
 		}
 		
 		public partial class Animation
@@ -892,9 +887,6 @@ namespace Mapsui.Samples.Droid
 			
 			// aapt resource value: 0x7f010003
 			public const int stackFromEnd = 2130771971;
-			
-			// aapt resource value: 0x7f01015a
-			public const int start_with_openstreetmap = 2130772314;
 			
 			// aapt resource value: 0x7f0100ce
 			public const int state_above_anchor = 2130772174;
@@ -3165,12 +3157,6 @@ namespace Mapsui.Samples.Droid
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f090028
-			public const int ApplicationName = 2131296296;
-			
-			// aapt resource value: 0x7f090027
-			public const int Hello = 2131296295;
-			
 			// aapt resource value: 0x7f090000
 			public const int abc_action_bar_home_description = 2131296256;
 			
@@ -3258,11 +3244,11 @@ namespace Mapsui.Samples.Droid
 			// aapt resource value: 0x7f090010
 			public const int abc_toolbar_collapse_description = 2131296272;
 			
-			// aapt resource value: 0x7f09002a
-			public const int action_settings = 2131296298;
+			// aapt resource value: 0x7f090028
+			public const int action_settings = 2131296296;
 			
-			// aapt resource value: 0x7f090029
-			public const int app_name = 2131296297;
+			// aapt resource value: 0x7f090027
+			public const int app_name = 2131296295;
 			
 			// aapt resource value: 0x7f09001e
 			public const int appbar_scrolling_view_behavior = 2131296286;
@@ -6527,12 +6513,6 @@ namespace Mapsui.Samples.Droid
 			
 			// aapt resource value: 1
 			public const int ViewStubCompat_android_layout = 1;
-			
-			public static int[] start_with_openstreetmap_style = new int[] {
-					2130772314};
-			
-			// aapt resource value: 0
-			public const int start_with_openstreetmap_style_start_with_openstreetmap = 0;
 			
 			static Styleable()
 			{
