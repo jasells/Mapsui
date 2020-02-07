@@ -72,9 +72,9 @@ namespace Mapsui.UI.Objects
         public static readonly BindableProperty TitleProperty = BindableProperty.Create(nameof(Title), typeof(string), typeof(MapView), default(string));
         public static readonly BindableProperty SubtitleProperty = BindableProperty.Create(nameof(Subtitle), typeof(string), typeof(MapView), default(string));
 
-        public Callout(MapControl mapControl)
+        public Callout(IMapControl mapControl)
         {
-            _mapControl = mapControl ?? throw new ArgumentNullException("MapControl shouldn't be null");
+            _mapControl = mapControl as MapControl ?? throw new ArgumentNullException("MapControl shouldn't be null");
 
             // We want any drawing outside of the info window
             IsClippedToBounds = true;

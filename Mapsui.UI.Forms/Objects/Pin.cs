@@ -17,6 +17,11 @@ namespace Mapsui.UI.Forms
         private int _bitmapId = -1;
         private byte[] _bitmapData;
         private readonly MapView _mapView;
+        private Callout _callout;
+        /// <summary>
+        /// a lazy loader to create a callout *only* if/when needed
+        /// </summary>
+        private readonly System.Lazy<Callout> calloutLoader;
 
         public static readonly BindableProperty TypeProperty = BindableProperty.Create(nameof(Type), typeof(PinType), typeof(Pin), default(PinType));
         public static readonly BindableProperty ColorProperty = BindableProperty.Create(nameof(Color), typeof(Xamarin.Forms.Color), typeof(Pin), SKColors.Red.ToFormsColor());
@@ -44,6 +49,9 @@ namespace Mapsui.UI.Forms
         public Pin(MapView mapView)
         {
             _mapView = mapView;
+
+            // tell the lazy loader how to build it when asked.
+            calloutLoader = new System.Lazy<Callout>(() => CreateCallout());
 
             CreateFeature();
         }
@@ -229,7 +237,8 @@ namespace Mapsui.UI.Forms
             }
         }
 
-        private Callout _callout;
+
+
 
         /// <summary>
         /// Gets the callout
@@ -239,30 +248,8 @@ namespace Mapsui.UI.Forms
         {
             get
             {
-                // Show a new Callout
-                if (_callout == null)
-                {
-                    // Create a default pin
-                    //_callout = _mapView.CreateCallout(Position);
-                    _callout = new Callout(this._mapView.MapControl as MapControl)
-                    {
-                        Anchor = Position
-                    };
-                    if (string.IsNullOrWhiteSpace(Address))
-                    {
-                        _callout.Type = CalloutType.Single;
-                        _callout.Title = Label;
-                    }
-                    else
-                    {
-                        _callout.Type = CalloutType.Detail;
-                        _callout.Title = Label;
-                        _callout.Subtitle = Address;
-                    }
-                }
-                UpdateCalloutPosition();
-
-                return _callout;
+                // Show a new Callout, create if needed
+                return UpdateCalloutPosition(_callout = _callout ?? calloutLoader.Value);
             }
             internal set
             {
@@ -270,6 +257,8 @@ namespace Mapsui.UI.Forms
                     _callout = value;
             }
         }
+
+
 
         /// <summary>
         /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="T:Mapsui.UI.Forms.Pin"/>.
@@ -389,6 +378,29 @@ namespace Mapsui.UI.Forms
             }
         }
 
+        /// <summary>
+        /// move the building of the callout to a different method so we can re-use easily.
+        /// Also, *if* needed, this method can be made async, while Callout property getter cannot.
+        /// </summary>
+        private Callout CreateCallout()
+        {
+            var callout = new Callout(_mapView.MapControl as MapControl);
+
+            if (string.IsNullOrWhiteSpace(Address))
+            {
+                callout.Type = CalloutType.Single;
+                callout.Title = Label;
+            }
+            else
+            {
+                callout.Type = CalloutType.Detail;
+                callout.Title = Label;
+                callout.Subtitle = Address;
+            }
+
+            return callout;
+        }
+
         private readonly object _sync = new object();
 
         private void CreateFeature()
@@ -490,13 +502,19 @@ namespace Mapsui.UI.Forms
         /// <summary>
         /// Set new position for Callout, if there is one
         /// </summary>
-        internal void UpdateCalloutPosition()
+        internal Callout UpdateCalloutPosition(Callout callout = null)
         {
-            if (_callout == null)
-                return;
+            // get the instance ref, if no ref passed
+            callout = callout ?? _callout;
 
-            var screen = _mapView._mapControl.Viewport.WorldToScreen(Position.ToMapsui());
-            _callout.Anchor = _mapView._mapControl.Viewport.ScreenToWorld(new Geometries.Point(screen.X - CalloutAnchor.X, screen.Y - CalloutAnchor.Y)).ToForms();
+            // if callout is initialized, then update it
+            if (callout != null)
+            {
+                var screen = _mapView._mapControl.Viewport.WorldToScreen(Position.ToMapsui());
+                callout.Anchor = _mapView._mapControl.Viewport.ScreenToWorld(new Geometries.Point(screen.X - CalloutAnchor.X, screen.Y - CalloutAnchor.Y)).ToForms();
+            }
+
+            return callout;
         }
     }
 }
